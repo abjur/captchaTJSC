@@ -23,3 +23,73 @@ for (i in 1:50) {
 baixar() %>% decifrar()
 ```
 
+## Baixar imagens para treino
+
+```{r}
+for(i in 1:1000) {
+  download() %>% 
+    classificar(path = 'data-raw/letras')
+}
+```
+
+## Ajuste do modelo
+
+```{r}
+devtools::load_all(".")
+library(caret)
+library(dplyr)
+
+d <- 'data-raw/letras' %>%
+  dir(full.names = TRUE) %>%
+  arrumar()
+
+set.seed(1234567)
+aff <- d %>% sample_n(4000)
+d_train <- aff %>%
+  mutate(y = factor(letra)) %>%
+  select(-arq, -group, -letra)
+
+m1 <- train(x = dplyr::select(as.data.frame(d_train), -y), 
+            y = d_train$y, method = 'rf')
+
+saveRDS(m1, 'data-raw/m_rf2.rds')
+# m2 <- train(x = dplyr::select(as.data.frame(d_train), -y), y = d_train$y, method = 'svmRadial')
+# saveRDS(m2, 'data-raw/m_svm.rds')
+# m3 <- train(x = dplyr::select(as.data.frame(d_train), -y), y = d_train$y, method = 'gbm')
+# saveRDS(m3, 'data-raw/m_gbm.rds')
+
+
+m1 <- readRDS('data-raw/m_rf.rds')
+# m2 <- readRDS('data-raw/m_svm.rds')
+# m3 <- readRDS('data-raw/m_gbm.rds')
+
+# d_final <- data.frame(pred1 = predict(m1), pred2 = predict(m2))
+# m <- train(x = d_final, y = d_train$y, method = 'gbm', tuneLength = 1)
+
+# acerto <- d %>%
+#   dplyr::anti_join(aff, c('arq', 'group')) %>%
+#   dplyr::mutate(y = factor(letra)) %>%
+#   dplyr::select(-arq, -group, -letra) %>% {
+#     dd <- .
+#     ddy <- as.data.frame(dplyr::select(dd, -y))
+#     pred1 <- predict(m1, newdata = ddy)
+#     pred2 <- predict(m2, newdata = ddy)
+#     d_pred <- data.frame(pred1, pred2)
+#     dplyr::mutate(dd, yest = predict(m, newdata = d_pred))
+#   } %>% 
+#   with(table(y, yest))
+
+acerto1 <- d %>%
+  dplyr::anti_join(aff, c('arq', 'group')) %>%
+  dplyr::mutate(y = factor(letra)) %>%
+  dplyr::select(-arq, -group, -letra) %>% {
+    dd <- .
+    ddy <- as.data.frame(dplyr::select(dd, -y))
+    dplyr::mutate(dd, yest = predict(m1, newdata = ddy))  
+  } %>% 
+  with(table(y, yest))
+
+# sum(diag(acerto)) / sum(acerto)
+sum(diag(acerto1)) / sum(acerto1)
+
+```
