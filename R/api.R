@@ -116,6 +116,3 @@ decifrar <- function(arq, deletar = TRUE) {
   letras <- dplyr::arrange(tab_f, ordem)$letra
   paste(letras, collapse = '')
 }
-
-
-
