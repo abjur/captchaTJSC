@@ -79,7 +79,7 @@ converter_em_df <- function(m) {
   as.data.frame(m) %>%
     dplyr::mutate(y = as.numeric(1:nrow(.))) %>%
     tidyr::gather(x, r, -y) %>%
-    dplyr::mutate(x = tidyr::extract_numeric(x))
+    dplyr::mutate(x = readr::parse_number(x))
 }
 
 #' Preencher

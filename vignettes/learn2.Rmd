@@ -1,0 +1,37 @@
+---
+title: "Untitled"
+author: "Julio Trecenti"
+date: "August 21, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+captchas <- plyr::llply(1:100, function(i) {
+  Sys.sleep(1)
+  download_new() %>% 
+    ler_new() %>% 
+    dplyr::mutate(cid = i)
+}, .progress = 'text')
+
+
+
+
+tabela_cores <- tibble::data_frame(
+  color_captcha = c("azul", "laranja", "preto", "rosa", "roxo", "verde", "vermelho"),
+  cor = 
+)
+
+aff <- captchas %>% 
+  dplyr::bind_rows() %>% 
+  dplyr::filter(cid == sample(unique(cid), 1))
+
+aff <- download_new() %>% ler_new()
+aff %>% desenhar()
+aff$captcha_color[1]
+aff %>% 
+  limpar_new() %>% 
+  ocr()
+
+
+
+```
