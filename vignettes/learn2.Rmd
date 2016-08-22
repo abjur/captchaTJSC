@@ -26,6 +26,7 @@ aff <- captchas %>%
   dplyr::filter(cid == sample(unique(cid), 1))
 
 aff <- download_new() %>% ler_new()
+
 aff %>% desenhar()
 aff$captcha_color[1]
 aff %>% 

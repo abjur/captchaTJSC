@@ -1,3 +1,4 @@
+#' @export
 download_new <- function() {
   u <- 'https://esaj.tjsc.jus.br/cpopg/imagemCaptcha.do'
   r <- httr::GET(u)
@@ -5,6 +6,7 @@ download_new <- function() {
   dados
 }
 
+#' @export
 ler_new <- function(dados) {
   img <- dados$imagem %>%
     strsplit(',') %>%
@@ -33,6 +35,7 @@ ler_new <- function(dados) {
     dplyr::mutate(captcha_color = color)
 }
 
+#' @export
 limpar_new <- function(d) {
   if (nrow(aff) > 10000) {
     aff <- aff %>%
@@ -82,10 +85,12 @@ limpar_new <- function(d) {
   aff
 }
 
+#' @export
 ocrTesseract <- function (dir_path, image_name, output_base, lang = "eng", psm = 5) {
   command <- paste0("tesseract ", dir_path, "/", image_name,
                     " ", dir_path, "/", output_base,
-                    " -l ", lang, " -psm ", psm)
+                    " -l ", lang, " -psm ", psm,
+                    ' outputbase text')
   system(command, wait = TRUE, ignore.stdout = T, ignore.stderr = T)
   result <- readLines(paste0(dir_path, "/", output_base, ".txt"))
   result
@@ -94,6 +99,12 @@ ocrTesseract <- function (dir_path, image_name, output_base, lang = "eng", psm =
 #' Instalar ocR
 #'
 #' https://github.com/greenore/ocR
+#'
+#'
+#' criar o arquivo
+#' /usr/share/tesseract-ocr/tessdata/configs
+#' e adicionar o seguinte conteudo
+#' tessedit_char_whitelist abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 #'
 #' @export
 ocr <- function(dados) {
@@ -109,11 +120,10 @@ ocr <- function(dados) {
       m[nrow(m):1, ]
     } %>%
     png::writePNG('aff.png')
-  txt <- capture.output(ocrTesseract('./', 'aff.png', 'aff')) %>%
+  txt <- ocrTesseract('./', 'aff.png', 'aff', psm = 6) %>%
     paste(collapse = '') %>%
     stringr::str_trim() %>%
-    stringr::str_replace_all('[^a-zA-Z]', '') %>%
-    stringi::stri_reverse()
+    stringr::str_replace_all('[^a-zA-Z]', '')
   file.remove('aff.png')
   file.remove('aff.txt')
   txt
