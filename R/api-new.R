@@ -36,7 +36,7 @@ ler_new <- function(dados) {
 }
 
 #' @export
-limpar_new <- function(d) {
+limpar_new <- function(aff) {
   if (nrow(aff) > 10000) {
     aff <- aff %>%
       dplyr::group_by(cor) %>%
